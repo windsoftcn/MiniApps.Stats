@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MiniApps.Stats.Models
+namespace MiniApps.Stats.Api
 {
-    public class GameUser
+    public class AppUserDto
     {
     }
 }

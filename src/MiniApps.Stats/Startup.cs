@@ -2,13 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MiniApps.Stats.Data;
+using MiniApps.Stats.Factories;
+using MiniApps.Stats.Identity;
+using MiniApps.Stats.Interfaces;
+using MiniApps.Stats.Services;
+using StackExchange.Redis;
 
 namespace MiniApps.Stats
 {
@@ -31,8 +40,38 @@ namespace MiniApps.Stats
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddDbContext<StatsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppStatsDb")));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            //services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDb")));
+
+            //services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            //{
+            //    options.Lockout.MaxFailedAccessAttempts = 10;
+            //    options.Password.RequiredLength = 6;
+            //    options.Password.RequireDigit = true;
+            //    options.Password.RequireNonAlphanumeric = true;
+            //    options.Password.RequireLowercase = true;
+            //    options.Password.RequireUppercase = true;
+            //    options.Password.RequireDigit = true;
+            //    options.Password.RequiredUniqueChars = 1;
+            //    options.User.RequireUniqueEmail = false;
+            //    options.SignIn.RequireConfirmedEmail = false;
+            //    options.SignIn.RequireConfirmedPhoneNumber = false;
+
+            //}).AddEntityFrameworkStores<AppIdentityDbContext>()
+            //.AddDefaultTokenProviders();
+
+            services.AddMemoryCache();
+            services.AddAutoMapper();
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetConnectionString("RedisDb")));
+            services.AddTransient<IRedisFactory, RedisFactory>();
+            services.AddSingleton<INumberGenerator, NumberGenerator>();
+            services.AddTransient<IAppUserService, AppUserService>();
+            services.AddTransient<IAppStatsReader, AppStatsService>();
+            services.AddTransient<IAppStatsWriter, AppStatsService>();
+
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,6 +98,9 @@ namespace MiniApps.Stats
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // Database-Update
+            app.MigrateDbContexts();
         }
     }
 }

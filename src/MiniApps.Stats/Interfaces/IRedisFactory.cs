@@ -10,6 +10,6 @@ namespace MiniApps.Stats.Interfaces
     {
         IDatabase Database { get; }
 
-
+        Task<bool> HashSetAsync(RedisKey key, RedisValue field, RedisValue value);
     }
 }

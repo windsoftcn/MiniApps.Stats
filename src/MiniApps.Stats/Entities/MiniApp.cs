@@ -12,5 +12,5 @@ namespace MiniApps.Stats.Entities
         public string AppSecret { get; set; }
 
         public string AppName { get; set; }
-    }    
+    }
 }
