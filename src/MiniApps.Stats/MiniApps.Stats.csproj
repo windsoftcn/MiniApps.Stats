@@ -16,11 +16,19 @@
 
 
   <ItemGroup>
+    <Folder Include="Entities\EntityTypeConfiguration\" />
     <Folder Include="Middleware\" />
     <Folder Include="ViewComponents\" />
     <Folder Include="Logging\" />
     <Folder Include="Exceptions\" />
     <Folder Include="wwwroot\lib\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Update="Views\Account\Login.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using MiniApps.Stats.Data;
-using MiniApps.Stats.Identity;
+using MiniApps.Stats.Data; 
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var statsDb =  scope.ServiceProvider.GetRequiredService<StatsDbContext>();
-                statsDb.Database.Migrate();
-
-                //var identityDb = scope.ServiceProvider.GetRequiredService<AppIdentityDbContext>();
-                //identityDb.Database.Migrate();
+                statsDb.Database.Migrate();                 
             }
         }
     }

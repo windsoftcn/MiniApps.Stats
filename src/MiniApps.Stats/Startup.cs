@@ -14,8 +14,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MiniApps.Stats.Data;
 using MiniApps.Stats.Factories;
-using MiniApps.Stats.Identity;
+using MiniApps.Stats.Filters;
 using MiniApps.Stats.Interfaces;
+using MiniApps.Stats.Models;
 using MiniApps.Stats.Services;
 using StackExchange.Redis;
 
@@ -40,26 +41,15 @@ namespace MiniApps.Stats
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowMyApp", policy =>
+                {
+                    policy.AllowAnyOrigin();
+                });
+            });
+
             services.AddDbContext<StatsDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AppStatsDb")));
-
-            //services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IdentityDb")));
-
-            //services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-            //{
-            //    options.Lockout.MaxFailedAccessAttempts = 10;
-            //    options.Password.RequiredLength = 6;
-            //    options.Password.RequireDigit = true;
-            //    options.Password.RequireNonAlphanumeric = true;
-            //    options.Password.RequireLowercase = true;
-            //    options.Password.RequireUppercase = true;
-            //    options.Password.RequireDigit = true;
-            //    options.Password.RequiredUniqueChars = 1;
-            //    options.User.RequireUniqueEmail = false;
-            //    options.SignIn.RequireConfirmedEmail = false;
-            //    options.SignIn.RequireConfirmedPhoneNumber = false;
-
-            //}).AddEntityFrameworkStores<AppIdentityDbContext>()
-            //.AddDefaultTokenProviders();
 
             services.AddMemoryCache();
             services.AddAutoMapper();
@@ -69,9 +59,29 @@ namespace MiniApps.Stats
             services.AddTransient<IAppUserService, AppUserService>();
             services.AddTransient<IAppStatsReader, AppStatsService>();
             services.AddTransient<IAppStatsWriter, AppStatsService>();
+        
+            services.AddMvc(options=>
+            {
+                options.Filters.Add<JsonExceptionFilter>();
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireDigit = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredUniqueChars = 1;
+                options.User.RequireUniqueEmail = false;
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            }).AddEntityFrameworkStores<StatsDbContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -86,11 +96,14 @@ namespace MiniApps.Stats
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }
 
-            app.UseHttpsRedirection();
+                //app.UseCors("AllowMyApp");
+            }  
+             
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

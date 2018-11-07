@@ -12,12 +12,12 @@ namespace MiniApps.Stats.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AppController : ControllerBase
+    public class AppsController : ControllerBase
     {
         private readonly IAppStatsWriter appStatsWriter;
         private readonly IMapper mapper;
 
-        public AppController(IAppStatsWriter appStatsWriter,
+        public AppsController(IAppStatsWriter appStatsWriter,
             IMapper mapper)
         {
             this.appStatsWriter = appStatsWriter ?? throw new ArgumentNullException(nameof(appStatsWriter));
