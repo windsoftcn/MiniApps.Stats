@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MiniApps.Stats.Services
+namespace MiniApps.Stats.Factories
 {
-    public class NumberGenerator : INumberGenerator
+    public class NumbersFactory : INumbersFactory
     {        
         private readonly IRedisFactory redisFactory;
 
-        public NumberGenerator(IRedisFactory redisFactory)
+        public NumbersFactory(IRedisFactory redisFactory)
         { 
             this.redisFactory = redisFactory ?? throw new ArgumentNullException(nameof(redisFactory));
         }         
@@ -20,7 +20,7 @@ namespace MiniApps.Stats.Services
 
         public Task<long> CreateUserSequentailId(string appId)
         {
-            RedisKey key = $"{appId}:Ids";
+            RedisKey key = $"{appId}:SequentialIds";
             RedisValue field = "UserId";
             lock (_userSequentialId)
             {

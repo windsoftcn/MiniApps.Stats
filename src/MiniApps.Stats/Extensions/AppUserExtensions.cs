@@ -41,7 +41,7 @@ namespace MiniApps.Stats.Extensions
         }
 
         public static RedisKey GetNewUserCountKeyByChannel(this AppUser appUser)
-        {
+        {            
             RedisKey channelKey = $"{appUser.AppId}:NewUserCount:{appUser.Channel}";
             return channelKey;
         }

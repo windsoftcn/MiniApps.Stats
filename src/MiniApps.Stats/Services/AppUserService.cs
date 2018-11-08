@@ -21,7 +21,7 @@ namespace MiniApps.Stats.Services
 
         public Task<bool> AddUserAsync(AppUser appUser, long sequentialId)
         {
-            var userKey = GetUserKey(appUser);          
+            var userKey = GetUserKey(appUser);
 
             return redisFactory.HashSetAsync(userKey , appUser.UserId,sequentialId);
         }
@@ -37,7 +37,7 @@ namespace MiniApps.Stats.Services
             var userKey = GetUserKey(appUser);
 
             RedisValue value = await redisFactory.Database.HashGetAsync(userKey, appUser.UserId);
-            if (value.IsInteger)
+            if (value.HasValue)
             {
                 return (long)value;
             }

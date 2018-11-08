@@ -16,15 +16,15 @@ namespace MiniApps.Stats.Services
 
         private readonly IAppUserService appUserService;
         private readonly IRedisFactory redisFactory;
-        private readonly INumberGenerator numberGenerator;
+        private readonly INumbersFactory numbersFactory;
 
         public AppStatsService(IAppUserService appUserService,
             IRedisFactory redisFactory,
-            INumberGenerator numberGenerator)
+            INumbersFactory numbersFactory)
         {
             this.appUserService = appUserService ?? throw new ArgumentNullException(nameof(appUserService));
             this.redisFactory = redisFactory ?? throw new ArgumentNullException(nameof(redisFactory));
-            this.numberGenerator = numberGenerator ?? throw new ArgumentNullException(nameof(numberGenerator));
+            this.numbersFactory = numbersFactory ?? throw new ArgumentNullException(nameof(numbersFactory));
         }
 
         public async Task<bool> ActiveAsync(AppUser appUser, DateTimeOffset? dateTime = null)
@@ -82,7 +82,7 @@ namespace MiniApps.Stats.Services
             if (!await appUserService.ExistsAsync(appUser))
             {
                 //获取序号Id
-                long sequentialId = await numberGenerator.CreateUserSequentailId(appUser.AppId);
+                long sequentialId = await numbersFactory.CreateUserSequentailId(appUser.AppId);
                 
                 if(sequentialId > 0 && await appUserService.AddUserAsync(appUser,sequentialId))
                 {
@@ -93,7 +93,7 @@ namespace MiniApps.Stats.Services
                     await UpdateCounter(appUser.GetNewUserCountKey(), OneHour, now);
                     // 按天
                     await UpdateCounter(appUser.GetNewUserCountKey(), OneDay, now);
-                    // 按天 + 渠道 
+                    // 按天 + 渠道                     
                     await UpdateCounter(appUser.GetNewUserCountKeyByChannel(), OneDay, now);
 
                     return true;

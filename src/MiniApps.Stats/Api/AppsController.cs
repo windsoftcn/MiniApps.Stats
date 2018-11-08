@@ -11,52 +11,46 @@ using System.Threading.Tasks;
 namespace MiniApps.Stats.Api
 {
     [Route("api/[controller]")]
-    [ApiController]
     public class AppsController : ControllerBase
     {
         private readonly IAppStatsWriter appStatsWriter;
+        private readonly IMiniAppService miniAppService;
         private readonly IMapper mapper;
 
         public AppsController(IAppStatsWriter appStatsWriter,
+            IMiniAppService miniAppService,
             IMapper mapper)
         {
             this.appStatsWriter = appStatsWriter ?? throw new ArgumentNullException(nameof(appStatsWriter));
+            this.miniAppService = miniAppService ?? throw new ArgumentNullException(nameof(miniAppService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] AppUserDto appUserDto)
         {
-            AppUser appUser =  mapper.Map<AppUserDto, AppUser>(appUserDto);
+            AppUser appUser = mapper.Map<AppUserDto, AppUser>(appUserDto);
+
+            if (string.IsNullOrWhiteSpace(appUser.Channel))
+            {
+                appUser.Channel = "default";
+            }
+
+            //if (!await miniAppService.MiniAppExistsAsync(appUser.AppId))
+            //    return BadRequest("no appid exists.");
 
             var now = DateTimeOffset.Now;
+
             // 新增用户
             await appStatsWriter.NewUserAsync(appUser, now);
-            
+
             // 登录 
             await appStatsWriter.LoginAsync(appUser, now);
 
             // 活跃
             await appStatsWriter.ActiveAsync(appUser, now);
 
-            return Ok();
+            return Ok("success");
         }
-
-
-        [HttpPost("active")]
-        public async Task<IActionResult> ActiveAsync([FromBody] AppUserDto appUserDto)
-        {
-            AppUser appUser = mapper.Map<AppUserDto, AppUser>(appUserDto);
-
-            var now = DateTimeOffset.Now;
-
-            // 活跃
-            await appStatsWriter.ActiveAsync(appUser, now);
-
-            return Ok();
-        }
-
-
-        
     }
 }

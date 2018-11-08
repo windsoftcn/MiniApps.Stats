@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MiniApps.Stats.Interfaces
 {
-    public interface INumberGenerator
+    public interface INumbersFactory
     {
         Task<long> CreateUserSequentailId(string appId);
     }

@@ -1,6 +1,6 @@
 using System;
 
-namespace MiniApps.Stats.Models
+namespace MiniApps.Stats.ViewModels
 {
     public class ErrorViewModel
     {

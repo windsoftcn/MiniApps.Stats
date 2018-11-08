@@ -55,14 +55,15 @@ namespace MiniApps.Stats
             services.AddAutoMapper();
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetConnectionString("RedisDb")));
             services.AddTransient<IRedisFactory, RedisFactory>();
-            services.AddSingleton<INumberGenerator, NumberGenerator>();
+            services.AddSingleton<INumbersFactory, NumbersFactory>();
+            services.AddTransient<IMiniAppService, MiniAppService>();
             services.AddTransient<IAppUserService, AppUserService>();
             services.AddTransient<IAppStatsReader, AppStatsService>();
             services.AddTransient<IAppStatsWriter, AppStatsService>();
         
             services.AddMvc(options=>
             {
-                options.Filters.Add<JsonExceptionFilter>();
+                options.Filters.Add<JsonExceptionFilter>();                
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
