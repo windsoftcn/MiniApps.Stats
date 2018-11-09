@@ -33,11 +33,13 @@ namespace MiniApps.Stats.Services
             long sequentialId = await appUserService.GetUserSequentialIdAsync(appUser);
             if(sequentialId > 0)
             {
+                // 获取记录时间
+                DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
+
                 // 判断用户当日是否活跃
-                if (!await appUserService.IsAcitveAsync(appUser, sequentialId, DateTimeOffset.Now))
+                if (!await appUserService.IsAcitveAsync(appUser, sequentialId, now))
                 {
-                    // 获取记录时间
-                    DateTimeOffset now = dateTime ?? DateTimeOffset.Now;
+                    
 
                     // 标记当天 Active
                     await appUserService.MarkActiveAsync(appUser, sequentialId, now);
@@ -60,7 +62,7 @@ namespace MiniApps.Stats.Services
             if(sequentialId > 0)
             {
                 // 获取记录时间
-                DateTimeOffset now = dateTime ?? DateTimeOffset.Now;
+                DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
 
                 // 标记当天Login
                 await appUserService.MarkLoginAsync(appUser, sequentialId, now);
@@ -87,12 +89,14 @@ namespace MiniApps.Stats.Services
                 if(sequentialId > 0 && await appUserService.AddUserAsync(appUser,sequentialId))
                 {
                     // 获取记录时间
-                    DateTimeOffset now = dateTime ?? DateTimeOffset.Now;
+                    DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
 
                     // 按小时
                     await UpdateCounter(appUser.GetNewUserCountKey(), OneHour, now);
+
                     // 按天
                     await UpdateCounter(appUser.GetNewUserCountKey(), OneDay, now);
+
                     // 按天 + 渠道                     
                     await UpdateCounter(appUser.GetNewUserCountKeyByChannel(), OneDay, now);
 
@@ -106,7 +110,7 @@ namespace MiniApps.Stats.Services
         {
             RedisKey combinedKey = $"{key}:{precision}";
 
-            DateTimeOffset now = dateTime ?? DateTimeOffset.Now;
+            DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
             long startTime =  (now.ToUnixTimeSeconds() / precision) * precision;
 
             return redisFactory.Database.HashIncrementAsync(combinedKey, startTime, count);

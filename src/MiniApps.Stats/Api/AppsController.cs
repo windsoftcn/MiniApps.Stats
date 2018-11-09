@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using MiniApps.Stats.Extensions;
 using MiniApps.Stats.Interfaces;
 using MiniApps.Stats.Models;
 using MiniApps.Stats.Validators;
@@ -39,7 +40,7 @@ namespace MiniApps.Stats.Api
             //if (!await miniAppService.MiniAppExistsAsync(appUser.AppId))
             //    return BadRequest("no appid exists.");
 
-            var now = DateTimeOffset.Now;
+            var now = DateTimeOffset.Now.ToChinaStandardTime();
 
             // 新增用户
             await appStatsWriter.NewUserAsync(appUser, now);

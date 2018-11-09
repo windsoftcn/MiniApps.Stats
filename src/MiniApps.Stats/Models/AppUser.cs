@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MiniApps.Stats.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,6 @@ namespace MiniApps.Stats.Models
 
         public string Channel { get; set; }
 
-        public DateTimeOffset CreateTime { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset CreateTime { get; set; } = DateTimeOffset.Now.ToChinaStandardTime();
     }
 }

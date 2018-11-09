@@ -30,22 +30,58 @@ namespace MiniApps.Stats.Controllers
                         
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
-            ViewData[PublicParams.ReturnUrl] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
+                var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    logger.LogInformation(1, $"User: {model.UserName} logged in");
+                    return RedirectToLocal(returnUrl);
+                }
 
+                //if (result.RequiresTwoFactor)
+                //{
+                //    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                //}
+
+                if (result.IsLockedOut)
+                {
+                    logger.LogInformation(2, "User account locked out");
+                    return View("Lockout");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "无效的登录, 请稍后再试.");
+                    return View(model);
+                }
             }
-            throw new NotImplementedException();
+            return View(model);
+        }
+         
+
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
         }
     }
 }
