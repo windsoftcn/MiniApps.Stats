@@ -3,13 +3,28 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniApps.Stats.ViewModels;
 
 namespace MiniApps.Stats.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
+        public HomeController()
+        {
+
+        }
+
+        /// <summary>
+        /// 仪表盘
+        /// </summary>        
+        public async Task<IActionResult> Dashboard()
+        {
+            return View();
+        }
+
         public IActionResult Index()
         {
             return View();

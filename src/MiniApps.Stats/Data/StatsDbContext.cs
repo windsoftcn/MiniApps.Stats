@@ -11,9 +11,7 @@ namespace MiniApps.Stats.Data
 {
     public class StatsDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<MiniApp> MiniApps { get; set; }
-
-        public DbSet<Merchant> Merchants { get; set; }
+        public DbSet<MiniApp> MiniApps { get; set; }         
 
         public DbSet<Advertisement> Advertisements { get; set; }
 
@@ -26,6 +24,10 @@ namespace MiniApps.Stats.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(t => t.MiniApps)
+                .WithOne();             
         }
     }
 }

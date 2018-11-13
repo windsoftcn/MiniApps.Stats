@@ -16,7 +16,7 @@ using MiniApps.Stats.Data;
 using MiniApps.Stats.Factories;
 using MiniApps.Stats.Filters;
 using MiniApps.Stats.Interfaces;
-using MiniApps.Stats.Models;
+using MiniApps.Stats.Entities;
 using MiniApps.Stats.Services;
 using StackExchange.Redis;
 
@@ -61,12 +61,8 @@ namespace MiniApps.Stats
             services.AddTransient<IAppStatsReader, AppStatsService>();
             services.AddTransient<IAppStatsWriter, AppStatsService>();
         
-            services.AddMvc(options=>
-            {
-                options.Filters.Add<JsonExceptionFilter>();                
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            
+            services.AddIdentityCore<ApplicationUser>(options =>
             {
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Password.RequiredLength = 6;
@@ -79,9 +75,23 @@ namespace MiniApps.Stats
                 options.User.RequireUniqueEmail = false;
                 options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
-            }).AddEntityFrameworkStores<StatsDbContext>()
+            })
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<StatsDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
+
+            services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = IdentityConstants.ApplicationScheme;
+                o.DefaultSignInScheme = IdentityConstants.ExternalScheme; 
+            }).AddIdentityCookies(o => {  });
+
+
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<JsonExceptionFilter>();
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
         }
 
@@ -91,6 +101,7 @@ namespace MiniApps.Stats
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
             else
             {
