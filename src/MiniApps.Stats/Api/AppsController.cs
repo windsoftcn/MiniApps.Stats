@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MiniApps.Stats.Extensions;
 using MiniApps.Stats.Interfaces;
 using MiniApps.Stats.Models;
-using MiniApps.Stats.Validators;
+using MiniApps.Stats.Validators; 
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +11,21 @@ using System.Threading.Tasks;
 
 namespace MiniApps.Stats.Api
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] 
     public class AppsController : ControllerBase
     {
         private readonly IAppStatsWriter appStatsWriter;
+        private readonly IAppStatsReader appStatsReader;
         private readonly IMiniAppService miniAppService;
         private readonly IMapper mapper;
 
         public AppsController(IAppStatsWriter appStatsWriter,
+            IAppStatsReader appStatsReader,
             IMiniAppService miniAppService,
             IMapper mapper)
         {
             this.appStatsWriter = appStatsWriter ?? throw new ArgumentNullException(nameof(appStatsWriter));
+            this.appStatsReader = appStatsReader ?? throw new ArgumentNullException(nameof(appStatsReader));
             this.miniAppService = miniAppService ?? throw new ArgumentNullException(nameof(miniAppService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
@@ -51,7 +54,14 @@ namespace MiniApps.Stats.Api
             // 活跃
             await appStatsWriter.ActiveAsync(appUser, now);
 
-            return Ok("success");
+            return Ok("success"); 
         }
+
+        public async Task<IActionResult> UserLoginCount()
+        {
+
+            throw new NotImplementedException();
+        }
+
     }
 }

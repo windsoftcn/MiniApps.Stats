@@ -1,0 +1,35 @@
+﻿@model MiniApps.Stats.ViewModels.AppsViewModels.UserLoginCountViewModel
+@{
+    ViewData["Title"] = "UserLoginCount";
+}
+
+<h2>用户登录</h2>
+
+<div id="realtime_chart" class="col-12 p-0" style="height:400px;"></div>
+
+
+@section scripts
+    {
+    <script src="~/lib/echarts/dist/echarts.common.min.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            var realtime_chart = echarts.init(document.getElementById("realtime_chart"));
+            var option = {
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: [820, 932, 901, 934, 1290, 1330, 1320],
+                    type: 'line'
+                }]
+            };
+            realtime_chart.setOption(option);
+        });
+
+    </script>
+}

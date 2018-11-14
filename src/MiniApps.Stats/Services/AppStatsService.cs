@@ -27,11 +27,13 @@ namespace MiniApps.Stats.Services
             this.numbersFactory = numbersFactory ?? throw new ArgumentNullException(nameof(numbersFactory));
         }
 
+        #region 统计写入
+
         public async Task<bool> ActiveAsync(AppUser appUser, DateTimeOffset? dateTime = null)
         {
             // 获取序号Id
             long sequentialId = await appUserService.GetUserSequentialIdAsync(appUser);
-            if(sequentialId > 0)
+            if (sequentialId > 0)
             {
                 // 获取记录时间
                 DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
@@ -39,11 +41,11 @@ namespace MiniApps.Stats.Services
                 // 判断用户当日是否活跃
                 if (!await appUserService.IsAcitveAsync(appUser, sequentialId, now))
                 {
-                    
+
 
                     // 标记当天 Active
                     await appUserService.MarkActiveAsync(appUser, sequentialId, now);
-                    
+
                     // 添加 Active 统计
                     await UpdateCounter(appUser.GetActiveCountKey(), OneHour, now);
                     await UpdateCounter(appUser.GetActiveCountKey(), OneDay, now);
@@ -59,7 +61,7 @@ namespace MiniApps.Stats.Services
             // 获取序号Id
             long sequentialId = await appUserService.GetUserSequentialIdAsync(appUser);
 
-            if(sequentialId > 0)
+            if (sequentialId > 0)
             {
                 // 获取记录时间
                 DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
@@ -85,8 +87,8 @@ namespace MiniApps.Stats.Services
             {
                 //获取序号Id
                 long sequentialId = await numbersFactory.CreateUserSequentailId(appUser.AppId);
-                
-                if(sequentialId > 0 && await appUserService.AddUserAsync(appUser,sequentialId))
+
+                if (sequentialId > 0 && await appUserService.AddUserAsync(appUser, sequentialId))
                 {
                     // 获取记录时间
                     DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
@@ -104,18 +106,25 @@ namespace MiniApps.Stats.Services
                 }
             }
             return false;
-        }       
+        }
 
         private Task<long> UpdateCounter(RedisKey key, long precision, DateTimeOffset? dateTime = null, long count = 1)
         {
             RedisKey combinedKey = $"{key}:{precision}";
 
             DateTimeOffset now = dateTime ?? DateTimeOffset.Now.ToChinaStandardTime();
-            long startTime =  (now.ToUnixTimeSeconds() / precision) * precision;
+            long startTime = (now.ToUnixTimeSeconds() / precision) * precision;
 
             return redisFactory.Database.HashIncrementAsync(combinedKey, startTime, count);
         }
 
-        
+        #endregion
+
+        #region 统计读取
+
+
+
+        #endregion
+
     }
 }

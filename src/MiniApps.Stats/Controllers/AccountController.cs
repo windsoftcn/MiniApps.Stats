@@ -48,6 +48,8 @@ namespace MiniApps.Stats.Controllers
             return View();
         }
         
+
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
